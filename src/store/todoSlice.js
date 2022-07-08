@@ -1,10 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-// export const fetchTodos = createThunk(
-//   'todos/fetchTodos',
-//   async () => {}
-// );
-
 const todoSlice = createSlice({
   name: 'todos',
   initialState: {
@@ -13,7 +8,7 @@ const todoSlice = createSlice({
   reducers: {
     addTodo: (state, action) => {
       state.todos.push({
-        id: new Date().toISOString(),
+        id: action.payload,
         title: action.payload,
         completed: false
       });

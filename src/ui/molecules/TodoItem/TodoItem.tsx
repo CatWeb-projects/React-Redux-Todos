@@ -1,6 +1,8 @@
 import React from 'react';
 import { useDispatch } from 'react-redux';
-import { todosProps } from '../../../libs/http/api';
+import { useRequest } from 'estafette';
+import axios from 'axios';
+import { todos, todosProps } from '../../../libs/http/api';
 import { removeTodo, toggleTodo } from '../../../store/todoSlice';
 
 interface Props {
@@ -9,13 +11,36 @@ interface Props {
 
 export const TodoItem = ({ todo }: Props) => {
   const dispatch = useDispatch();
+  const { request } = useRequest<todosProps[]>();
+
+  const deleteTodo = (id: number | string) => {
+    try {
+      request(todos.delete.action(id));
+      dispatch(removeTodo(id));
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const toggle = (id: number | string) => {
+    try {
+      request(
+        axios.patch(`http://localhost:3005/todos/${id}`, {
+          completed: !todo.completed
+        })
+      );
+      dispatch(toggleTodo(id));
+    } catch (e) {
+      console.log(e);
+    }
+  };
 
   return (
-    <div className="todos__items" key={todo.id}>
+    <div className="todos__items">
       <input
         type="checkbox"
         checked={todo.completed}
-        onChange={() => dispatch(toggleTodo(todo.id))}
+        onChange={() => toggle(todo.id)}
       />
       <span
         style={
@@ -25,7 +50,7 @@ export const TodoItem = ({ todo }: Props) => {
         {todo.title}
       </span>
       <span
-        onClick={() => dispatch(removeTodo(todo.id))}
+        onClick={() => deleteTodo(todo.id)}
         style={{
           color: 'red',
           marginLeft: '10px',
